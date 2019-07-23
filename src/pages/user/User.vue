@@ -111,7 +111,6 @@
         }],
         formLabelWidth: '120px',
         dialogFormVisible: false,
-        aa : true,
         row : {},
         index : null,
         form : {
@@ -138,6 +137,9 @@
             }
           });*!/
        },*/
+      submitForm(formName){
+
+      },
       add (form) {
         /* this.$prompt(['请输入用户表','sss'], '提示', {confirmButtonText: '确定',
            cancelButtonText: '取消'},
@@ -156,7 +158,7 @@
        //this.tableData.push({num:this.num,accounts :this.accounts})*/
         this.tableData.push({users : form.users ,accounts :form.accounts , password :form.password,
           state:form.state,area :form.area,role:form.role,openId:form.openId});
-        this.dialogFormVisible = false
+        this.dialogFormVisible = false;
       },
        onRowClick(row) {
          console.log(row);
@@ -174,6 +176,7 @@
         console.log(index, row);
       },
       handleEdit(index, form){
+
         this.tableData.splice(index,1, this.tableData.push({users : form.users ,accounts :form.accounts , password :form.password,
           state:form.state,area :form.area,role:form.role,openId:form.openId}) );
       }
