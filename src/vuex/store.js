@@ -8,12 +8,14 @@ export default new Vuex.Store({
     username : "",
   },
   mutations: {
-    changeUsername : (state,name) => {
-      state.username = name
+    changeUsername : (state,username) => {
+      state.username = username;
     }
   },
 
   actions: {
-
+    changeUsername1(context){
+      context.commit("changeUsername");
+    }
   }
 })

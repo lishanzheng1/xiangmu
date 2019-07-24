@@ -1,193 +1,191 @@
 <template>
-  <div class="hello">
-    <div>基础服务&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;>
-      <span>&nbsp;用户管理</span>
+    <div class="hello">
+        <div>基础服务&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;>
+            <span>&nbsp;用户管理</span>
+        </div>
+        <el-form :model="ruleForm2" status-icon  ref="ruleForm"  class="demo-ruleForm" >
+            <el-form-item label="用户名称  :" prop="search" >
+                <el-input v-model="ruleForm2.search"  style="width: 200px ; margin-right: 20px" placeholder="用户名称">
+                </el-input>
+                <el-button type="primary"  @click="submitForm(ruleForm2)">查询</el-button>
+            </el-form-item>
+            <el-form-item>
+                <el-table :data="tableData" style="width: 100%" >
+                    <el-table-column type="index" :index="indexMethod" label="序号" width="50"></el-table-column>
+                    <el-table-column prop="loginName" label="账号">
+                    </el-table-column>
+                    <el-table-column prop="role.name" label="角色">
+                    </el-table-column>
+                    <el-table-column prop="dept.name" label="地区">
+                    </el-table-column>
+                    <el-table-column label="操作" width="180">
+                        <template slot-scope="scope">
+                            <el-button size="mini" @click="handleEdit(scope.$index , scope.row)">编辑</el-button>
+                            <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+                        </template>
+                    </el-table-column>
+                </el-table>
+            </el-form-item>
+        </el-form>
+        <!--分页-->
+        <div class="block">
+            <el-pagination
+                    @size-change="handleSizeChange" @current-change="handleCurrentChange"
+                    :current-page="currentPage"
+                    :page-size="pagesize" layout=" slot, prev, pager, next" :total="list.length">
+                <el-button   class="first-pager" @click="toFirstPage">首页</el-button>
+            </el-pagination>
+            <el-pagination
+                    @size-change="handleSizeChange" @current-change="handleCurrentChange"
+                    :current-page="currentPage"
+                    :page-size="pagesize" layout=" slot, jumper" :total="list.length">
+                <el-button   class="first-pager" @click="toLastPage">尾页</el-button>
+            </el-pagination>
+        </div>
     </div>
-    <el-form :model="ruleForm2" status-icon  ref="ruleForm"  class="demo-ruleForm" >
-      <el-form-item label="用户名称  :" prop="search" >
-        <el-input v-model="ruleForm2.search"  style="width: 200px ; margin-right: 20px" placeholder="用户名称">
-        </el-input>
-        <el-button type="primary"  @click="submitForm('ruleForm2')">查询</el-button>
-      </el-form-item>
-      <el-form-item>
-        <el-table :data="tableData" style="width: 100%"  @row-click="onRowClick">
-          <el-table-column label="用户表" width="100">
-            <template slot-scope="scope">
-              <span>{{ scope.row.users}}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="登录名" width="100">
-            <template slot-scope="scope">
-              <span>{{ scope.row.accounts}}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="密码" width="100">
-            <template slot-scope="scope">
-              <span>{{ scope.row.password }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="状态" width="100">
-            <template slot-scope="scope">
-              <span>{{ scope.row.state }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="地区" width="100">
-            <template slot-scope="scope">
-              <span>{{ scope.row.name }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="角色" width="100">
-            <template slot-scope="scope">
-              <span>{{ scope.row.role }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="openID" width="100">
-            <template slot-scope="scope">
-              <span>{{ scope.row.openId }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="操作" width="180">
-            <template slot-scope="scope">
-              <el-button size="mini" @click="handleEdit(scope.$index , scope.row)">编辑</el-button>
-              <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-      </el-form-item>
-      <el-form-item >
-        <el-button type="primary"  @click="dialogFormVisible = true">增加</el-button>
-      </el-form-item>
-    </el-form>
-    <el-dialog  title="添加"  :visible.sync="dialogFormVisible">
-      <el-form :model="form">
-        <el-form-item label="用户表" :label-width="formLabelWidth">
-          <el-input v-model="form.users" autocomplete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="登录名" :label-width="formLabelWidth">
-          <el-input v-model="form.accounts" autocomplete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="密码" :label-width="formLabelWidth">
-          <el-input v-model="form.password" autocomplete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="状态" :label-width="formLabelWidth">
-          <el-input v-model="form.state" autocomplete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="地区" :label-width="formLabelWidth">
-          <el-input v-model="form.area" autocomplete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="角色" :label-width="formLabelWidth">
-          <el-input v-model="form.role" autocomplete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="openId" :label-width="formLabelWidth">
-          <el-input v-model="form.openId" autocomplete="off"></el-input>
-        </el-form-item>
-        <!-- <el-form-item label="密码" :label-width="formLabelWidth">
-           <el-input v-model="tableData." autocomplete="off"></el-input>
-         </el-form-item>-->
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button  type="primary" @click="add(form)">确 定</el-button>
-      </div>
-    </el-dialog>
-  </div>
 </template>
 <script>
-  export default {
-    name: 'user',
-    data() {
-      return {
-        ruleForm2: {
-          search: '',
+    export default {
+        name: 'user',
+        data() {
+            return {
+                ruleForm2: {
+                    search: '',
+                },
+                tableData: [
+                    {
+                        loginName:'',
+                        dept: {},
+                        role: {}
+                    }
+                ],
+                formLabelWidth: '120px',
+                dialogFormVisible: false,
+                row: {},
+                index: null,
+                list: [],
+                glist:[],
+                update:false,
+                currentPage:1, //初始页
+                pagesize:5,    //    每页的数据
+                userList: [],
+                form: {
+                    accounts: '',
+                    password: '',
+                    state: '',
+                    area: '',
+                    role: '',
+                    openId: '',
+                }
+            };
         },
-        tableData: [{
-          users : '1',
-          accounts : '1',
-          password: '1',
-          state: '1',
-          area: '1',
-          role: '1',
-          openId : '10',
-        }],
-        formLabelWidth: '120px',
-        dialogFormVisible: false,
-        row : {},
-        index : null,
-        form : {
-          users :'',
-          accounts :'',
-          password : '',
-          state: '',
-          area: '',
-          role: '',
-          openId : '',
-        }
-      };
-    },
-    methods: {
-      /* submitForm(formName) {
-         /!* this.$refs[formName].validate((valid) => {
-            if (valid) {
-              /!*将vuex中的changeUsernane的方法改变 ， 将state中的username 改为 当前登录的人*!/
-              this.$store.commit("changeUsername", this.ruleForm2.username);
-              this.$router.push({path:'/index'/!*,query : {username :this.ruleForm2.username }*!/});
-            } else {
-              console.log('error submit!!');
-              return false;
+        methods: {
+            //添加
+            handleAdd(){
+                this.form={};
+                this.dialogFormVisible = true;
+            },
+            //查
+            submitForm(ruleForm2) {
+                console.log(ruleForm2);
+                if (ruleForm2.search !==" ") {
+                    let newArr = [];
+                    for (let i = 0; i < this.gdlist.length; i++) {
+                        if (this.gdlist[i].accounts.search(this.ruleForm2.search) !== -1) {
+                            newArr.push(this.gdlist[i])
+                        }
+                    }
+                    this.list = newArr;
+                } else {
+                    this.list = this.glist;
+                }
+            },
+            //弹框时出现的 编辑或者添加页面
+            add(form) {
+                if (this.update){
+                    //编辑 弹框页面
+                    this.tableData[this.index] = form;
+                    console.log(this.index);
+                    //把编辑变换为添加
+                    this.update= false;
+                }else {
+                    //添加
+                    this.tableData.push(form);
+                    this.list = this.tableData;
+                }
+                this.dialogFormVisible = false;
+            },
+            //删除
+            handleDelete(index) {
+                this.tableData.splice(index, 1);
+            },
+            //编辑显示
+            handleEdit(index, row) {
+                //获得当前行的索引
+                console.log(index);
+                this.index = index;
+                //将编辑显示出弹框
+                this.dialogFormVisible = true;
+                this.form  = row;
+                this.update = true;
+            },
+            // 初始页currentPage、初始每页数据数pagesize和数据data
+            handleSizeChange: function (size) {
+                this.pagesize = size;
+                console.log("每页下拉显示数据"+this.pagesize)  //每页下拉显示数据
+            },
+            handleCurrentChange: function(val){
+                this.currentPage = val;
+                console.log("点击第几页"+this.currentPage)  //点击第几页
+            },
+            //分页跳转的首页
+            toFirstPage() {
+                this.currentPage = 1;
+            },
+            //分页跳转的尾页
+            toLastPage() {
+                //找到最后一页 向下取整
+                this.currentPage = Math.floor(this.list.length/this.pagesize+1);
+                console.log(this.currentPage)
+            },
+            indexMethod(index) {
+                return index+1;
+            },
+        },
+        watch: {
+            tableData(newV) {
+                this.list = newV;
+                this.gdlist = newV;
+                /*console.log(newV);*/
             }
-          });*!/
-       },*/
-      submitForm(formName){
+        },
+        mounted() {
+            this.$axios.get('http://10.16.10.250:7001/sys/user/list')
+                .then(response => {
+                        (this.tableData = response.data.data)
+                        console.log(response.data.data);
+                    }
+                )
+                .catch(function (error) { // 请求失败处理
+                    console.log(error);
+                });
+        }
 
-      },
-      add (form) {
-        /* this.$prompt(['请输入用户表','sss'], '提示', {confirmButtonText: '确定',
-           cancelButtonText: '取消'},
-         ).then(({ value,value1 }) => {
-           this.tableData.push({users:value,accounts :value1})
-           /!* this.$message({
-             type: 'success',
-             message: '你的用户名是: ' + value
-           });*!/
-         }).catch(() => {
-           this.$message({
-             type: 'info',
-             message: '取消输入'
-           });
-         });
-       //this.tableData.push({num:this.num,accounts :this.accounts})*/
-        this.tableData.push({users : form.users ,accounts :form.accounts , password :form.password,
-          state:form.state,area :form.area,role:form.role,openId:form.openId});
-        this.dialogFormVisible = false;
-      },
-       onRowClick(row) {
-         console.log(row);
-         //传过来点击哪个就是哪个对象
-         this.row = row;
-         //索引
-         this.index = this.tableData.indexOf(row);
-         console.log(this.index);
-      },
-     /* set(form) {
-        this.tableData.splice(this.index,1,this.tableData.push({users : form.users ,accounts :form.accounts , password :form.password}))
-      },*/
-      handleDelete(index, row) {
-        this.tableData.splice(index,1);
-        console.log(index, row);
-      },
-      handleEdit(index, form){
-
-        this.tableData.splice(index,1, this.tableData.push({users : form.users ,accounts :form.accounts , password :form.password,
-          state:form.state,area :form.area,role:form.role,openId:form.openId}) );
-      }
     }
-  }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-  .demo-ruleForm{
-    margin: 40px 0 0 0;
-  }
+    .demo-ruleForm{
+        margin: 40px 0 0 0;
+    }
+    .block {
+        margin-left: 30%;
+    }
+    .el-pagination{
+        float: left;
+    }
+
+
 
 </style>
