@@ -23,6 +23,7 @@
 </template>
 
 <script>
+    import storageUtil from '../../util/storageUtil'
     export default {
         name: 'login',
         computed: {
@@ -32,6 +33,7 @@
         },
         data() {
             return {
+                LoginName : "",
                 data: [
                     {
                         label: '基础服务',

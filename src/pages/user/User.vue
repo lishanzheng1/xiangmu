@@ -7,7 +7,7 @@
             <el-form-item label="用户名称  :" prop="search" >
                 <el-input v-model="ruleForm2.search"  style="width: 200px ; margin-right: 20px" placeholder="用户名称">
                 </el-input>
-                <el-button type="primary"  @click="submitForm(ruleForm2)">查询</el-button>
+                <el-button type="primary"  @click="submitForm()">查询</el-button>
             </el-form-item>
             <el-form-item>
                 <el-table :data="tableData" style="width: 100%" >
@@ -18,10 +18,10 @@
                     </el-table-column>
                     <el-table-column prop="dept.name" label="地区">
                     </el-table-column>
-                    <el-table-column label="操作" width="180">
+                    <el-table-column label="操作" width="300">
                         <template slot-scope="scope">
-                            <el-button size="mini" @click="handleEdit(scope.$index , scope.row)">编辑</el-button>
-                            <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+                            <el-button type="info" icon="el-icon-setting" @click="handleEdit(scope.$index , scope.row)"></el-button>
+                            <el-button  type="danger" icon="el-icon-delete" @click="handleDelete(scope.$index, scope.row)"></el-button>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -45,6 +45,8 @@
     </div>
 </template>
 <script>
+    import { setPassword } from '../../api'
+    import storageUtil from '../../util/storageUtil'
     export default {
         name: 'user',
         data() {
@@ -56,11 +58,14 @@
                     {
                         loginName:'',
                         dept: {},
-                        role: {}
+                        role: {},
+                        _id: "",
+                        loginPwd:""
                     }
                 ],
                 formLabelWidth: '120px',
                 dialogFormVisible: false,
+                id:"",
                 row: {},
                 index: null,
                 list: [],
@@ -80,25 +85,42 @@
             };
         },
         methods: {
+             async setPasswordNet() {
+                 await setPassword(this.id,'GET');
+             },
             //添加
             handleAdd(){
                 this.form={};
                 this.dialogFormVisible = true;
             },
             //查
-            submitForm(ruleForm2) {
+            submitForm() {
+                this.$axios.get('http://127.0.0.1:7001/sys/user/listForPage?queryName='+this.ruleForm2.search,
+                    {headers:
+                            {sessionId:this.$store.state.sessionId}
+                    })
+                    .then(response => {
+                             (this.tableData = response.data.data.list);
+                            console.log(response.data.data.list);
+                        }
+                    )
+                    .catch(function (error) { // 请求失败处理
+                        console.log(error);
+                        });
+
+/*
                 console.log(ruleForm2);
                 if (ruleForm2.search !==" ") {
                     let newArr = [];
                     for (let i = 0; i < this.gdlist.length; i++) {
-                        if (this.gdlist[i].accounts.search(this.ruleForm2.search) !== -1) {
+                        if (this.gdlist[i].loginName.search(this.ruleForm2.search) !== -1) {
                             newArr.push(this.gdlist[i])
                         }
                     }
                     this.list = newArr;
                 } else {
                     this.list = this.glist;
-                }
+                }*/
             },
             //弹框时出现的 编辑或者添加页面
             add(form) {
@@ -117,17 +139,60 @@
             },
             //删除
             handleDelete(index) {
-                this.tableData.splice(index, 1);
+                this.index = index;
+                //获得到_id值
+                console.log(this.tableData[index]._id);
+                //this.tableData[this.tableData.indexOf(this.tableData._id)]
+                this.$axios.get('http://127.0.0.1:7001/sys/user/delete?id='+this.tableData[index]._id,
+                    {headers:
+                            {sessionId:this.$store.state.sessionId}
+                    })
+                    .then(response => {
+                            // (this.tableData = response.data.data);
+                            console.log(response.data);
+                        }
+                    )
+                    .catch(function (error) { // 请求失败处理
+                        console.log(error);
+                    });
+
+                //this.tableData.splice(index, 1);
             },
-            //编辑显示
+            //设置
             handleEdit(index, row) {
-                //获得当前行的索引
+                this.id =row._id;
+                try {
+                   let result = this.setPasswordNet();
+                   console.log(result)
+                  /* if (result == '0'){
+                       result
+                   } else {
+                       this.$message.error('登录失败，请核对账号和密码');
+                   }*/
+                }catch (e) {
+                    alert(e.message);
+                    this.$message.error('系统异常，请联系管理员');
+                }
+
+
+            /*    this.$axios.get('http://127.0.0.1:7001/sys/user/setPassword?_id='+row._id)
+                    .then(response => {
+                            (this.tableData.loginPwd= response.data.data);
+                            console.log(response.data.data);
+                        }
+                    )
+                    .catch(function (error) { // 请求失败处理
+                        console.log(error);
+                    });
+*/
+
+                /*   //获得当前行的索引
                 console.log(index);
                 this.index = index;
                 //将编辑显示出弹框
                 this.dialogFormVisible = true;
                 this.form  = row;
-                this.update = true;
+                this.update = true;*/
             },
             // 初始页currentPage、初始每页数据数pagesize和数据data
             handleSizeChange: function (size) {
@@ -160,9 +225,9 @@
             }
         },
         mounted() {
-            this.$axios.get('http://10.16.10.250:7001/sys/user/list')
+            this.$axios.get('http://127.0.0.1:7001/sys/user/list')
                 .then(response => {
-                        (this.tableData = response.data.data)
+                        (this.tableData = response.data.data);
                         console.log(response.data.data);
                     }
                 )

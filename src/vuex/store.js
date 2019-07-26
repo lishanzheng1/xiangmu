@@ -6,10 +6,14 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   state: {
     username : "",
+    sessionId:""
   },
   mutations: {
     changeUsername : (state,username) => {
       state.username = username;
+    },
+    getSessionId : (state, sessionId) =>  {
+      state.sessionId = sessionId;
     }
   },
 
