@@ -177,11 +177,6 @@
                           function (data) {
                             console.log(data)
                           }
-                          /*response => {
-                            this.tableData.name= response.data.data.name;
-                            console.log(response.data.data.name);
-                            console.log(this.tableData.name);
-                          }*/
                   )
                   .catch(function (error) { // 请求失败处理
                     console.log(error);
